@@ -1,10 +1,14 @@
 package com.tenco.blog_v1.board;
 
+import com.tenco.blog_v1.user.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 
+@NoArgsConstructor
 @Entity
 @Table(name = "board_tb")
 @Data
@@ -16,8 +20,21 @@ public class Board {
     private String title;
     private String content;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id") // 게시글 작성자 정보
+    private User user;
+
     // created_at 컬럼과 매핑하며, 이 필드는 데이터 저장시 자동으로 설정된다.
     @Column(name = "created_at", insertable = false, updatable = false)
     private Timestamp createdAt;
+
+    @Builder
+    public Board(Integer id, String title, String content, User user, Timestamp createdAt) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.user = user;
+        this.createdAt = createdAt;
+    }
 
 }
