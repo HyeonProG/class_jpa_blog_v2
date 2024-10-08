@@ -26,6 +26,42 @@ public class BoardController {
 
     private final HttpSession session;
 
+
+    /**
+     * 게시글 삭제 기능
+     * 주소 설계 : http://localhost:8080/board/10/delete (form 활용이기 때문에 동사로 delete 선언)
+     * form 태그에서는 GET, POST 방식만 지원하기 때문 (JS로 PUT, DELETE 활용 가능)
+     *
+     * @param id
+     * @return
+     */
+    @PostMapping("/board/{id}/delete")
+    public String delete(@PathVariable(name = "id") Integer id, HttpSession session) {
+        // 유효성, 인증 검사
+        // 세션에서 로그인 사용자 정보 가져오기 -> 인증(로그인 여부), 인가(권한 - 내 글인지 아닌지)
+        User sessionUser = (User) session.getAttribute("sessionUser");
+
+        if (sessionUser == null) {
+            return "redirect:/login-form";
+        }
+
+        // 인가(권한) 체크
+        Board board = boardRepository.findById(id);
+        if (board == null) {
+            return "redirect:/error-404";
+        }
+
+        if (!board.getUser().getId().equals(sessionUser.getId())) {
+            return "redirect:/error-403";
+        }
+
+        // 게시글 삭제
+        // boardRepository.deleteByIdJPA(id); --> JPA API
+        boardRepository.deleteById(id); // --> JPQL
+        // boardNativeRepository.deleteById(id); --> 네이티브
+        return "redirect:/";
+    }
+
     /**
      * 특정 게시글 요청 화면
      * 주소 설계 : http://localhost:8080/board/10
@@ -98,20 +134,6 @@ public class BoardController {
         return "redirect:/";
     }
 
-
-    /**
-     * 게시글 삭제 기능
-     * 주소 설계 : http://localhost:8080/board/10/delete (form 활용이기 때문에 동사로 delete 선언)
-     * form 태그에서는 GET, POST 방식만 지원하기 때문 (JS로 PUT, DELETE 활용 가능)
-     *
-     * @param id
-     * @return
-     */
-    @PostMapping("/board/{id}/delete")
-    public String delete(@PathVariable(name = "id") Integer id) {
-        boardNativeRepository.deleteById(id);
-        return "redirect:/";
-    }
 
     /**
      * 게시글 수정 화면

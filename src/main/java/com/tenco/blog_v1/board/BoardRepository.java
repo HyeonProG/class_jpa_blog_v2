@@ -1,6 +1,7 @@
 package com.tenco.blog_v1.board;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,7 @@ public class BoardRepository {
 
     /**
      * 게시글 조회
+     *
      * @param id 조회할 게시글 ID
      * @return 조회된 Board 엔티티, 존재하지 않으면 null 반환
      */
@@ -26,6 +28,7 @@ public class BoardRepository {
     /**
      * JPQL의 FETCH 조인 사용 - 성능 최적화
      * 한방에 쿼리를 사용해서 즉, 직접 조인해서 데이터를 가져 온다.
+     *
      * @param id
      * @return
      */
@@ -39,18 +42,42 @@ public class BoardRepository {
 
     /**
      * 모든 게시글 조회
+     *
      * @return 게시글 리스트
      */
     public List<Board> findAll() {
         TypedQuery<Board> jpql = em.createQuery(" SELECT b FROM Board b ORDER BY id DESC", Board.class);
         return jpql.getResultList();
     }
-    
+
     // em.persist(board) -> 비영속 상태인 엔티티를 영속 상태로 전환
     @Transactional
     public Board save(Board board) {
         em.persist(board);
         return board;
+    }
+
+    /**
+     * 게시글 삭제하기
+     * @param id
+     */
+    // DELETE JPA API 메서드를 활용, JPQL
+    @Transactional // 트랜잭션 내에서 실행되도록 보장
+    public void deleteById(int id) {
+        Query jpql = em.createQuery(" DELETE FROM Board b WHERE b.id = :id ");
+        jpql.setParameter("id", id);
+        jpql.executeUpdate();
+    }
+
+    /**
+     * JPA API를 사용해서 삭제 만들어보기
+     */
+    @Transactional // 트랜잭션 내에서 실행되도록 보장
+    public void deleteByIdJPA(int id) {
+        Board board = em.find(Board.class, id);
+        if (board != null) {
+            em.remove(board);
+        }
     }
 
 }
