@@ -1,14 +1,13 @@
 package com.tenco.blog_v1.board;
 
+import com.tenco.blog_v1.user.User;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,6 +24,7 @@ public class BoardController {
     // JPA API, JPQL
     private final BoardRepository boardRepository;
 
+    private final HttpSession session;
 
     /**
      * 특정 게시글 요청 화면
@@ -81,10 +81,20 @@ public class BoardController {
      * @return
      */
     @PostMapping("board/save")
-    public String save(@RequestParam(name = "title") String title, @RequestParam(name = "content") String content) {
+    public String save(@ModelAttribute BoardDTO.saveDTO reqDTO) {
+        User sessionUser = (User) session.getAttribute("sessionUser");
+
+        if (sessionUser == null) {
+            return "redirect:/login-form";
+        }
+
         // 파라미터가 올바르게 전달 되었는지 확인
-        log.warn("save 실행 : 제목={}, 내용={}", title, content);
-        boardNativeRepository.save(title, content);
+        log.warn("save 실행 : 제목={}, 내용={}", reqDTO.getTitle(), reqDTO.getContent());
+        // boardNativeRepository.save(title, content);
+
+        // saveDTO에서 toEntity를 사용해서 Board 엔티티로 변환하고 인수값으로 User 정보를 넣었다.
+        // 결국 Board 엔티티로 반환이 된다.
+        boardRepository.save(reqDTO.toEntity(sessionUser));
         return "redirect:/";
     }
 
