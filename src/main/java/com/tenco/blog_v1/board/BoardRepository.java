@@ -1,8 +1,11 @@
 package com.tenco.blog_v1.board;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Repository // IoC
@@ -31,6 +34,15 @@ public class BoardRepository {
         return em.createQuery(jpql, Board.class)
                 .setParameter("id", id)
                 .getSingleResult();
+    }
+
+    /**
+     * 모든 게시글 조회
+     * @return 게시글 리스트
+     */
+    public List<Board> findAll() {
+        TypedQuery<Board> jpql = em.createQuery(" SELECT b FROM Board b ORDER BY id DESC", Board.class);
+        return jpql.getResultList();
     }
 
 }
