@@ -1,4 +1,4 @@
-package com.tenco.blog_v1.board;
+package com.tenco.blog_v2.board;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;

@@ -1,6 +1,6 @@
-package com.tenco.blog_v1.user;
+package com.tenco.blog_v2.user;
 
-import com.tenco.blog_v1.board.Board;
+import com.tenco.blog_v2.board.Board;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;

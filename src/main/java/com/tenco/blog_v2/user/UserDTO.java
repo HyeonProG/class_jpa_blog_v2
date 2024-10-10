@@ -1,4 +1,4 @@
-package com.tenco.blog_v1.user;
+package com.tenco.blog_v2.user;
 
 import lombok.Data;
 
